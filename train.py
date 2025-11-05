@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 import argparse, os
 from packaging import version
+import gc
+import threading
+import time
 
 import torch
 from datasets import load_dataset
@@ -10,6 +13,49 @@ import trl
 
 from itertools import islice
 import numpy as np
+
+class GPUMemoryMonitor:
+    def __init__(self):
+        self.peak_memory = 0.0
+        self.monitoring = False
+        self.monitor_thread = None
+        
+    def start_monitoring(self):
+        if not torch.cuda.is_available():
+            print("[WARNING] CUDA not available, memory monitoring disabled")
+            return
+            
+        self.monitoring = True
+        self.peak_memory = 0.0
+        torch.cuda.reset_peak_memory_stats()
+        
+        def monitor_loop():
+            while self.monitoring:
+                if torch.cuda.is_available():
+                    current_memory = torch.cuda.memory_allocated() / 1024 / 1024 / 1024
+                    self.peak_memory = max(self.peak_memory, current_memory)
+                time.sleep(0.1)
+        
+        self.monitor_thread = threading.Thread(target=monitor_loop, daemon=True)
+        self.monitor_thread.start()
+        print("[INFO] GPU memory monitoring started")
+    
+    def stop_monitoring(self):
+        self.monitoring = False
+        if self.monitor_thread:
+            self.monitor_thread.join(timeout=1.0)
+        
+        if torch.cuda.is_available():
+            pytorch_peak = torch.cuda.max_memory_allocated() / 1024 / 1024 / 1024
+            self.peak_memory = max(self.peak_memory, pytorch_peak)
+            
+        print(f"[INFO] GPU memory monitoring stopped")
+        return self.peak_memory
+    
+    def get_current_memory(self):
+        if torch.cuda.is_available():
+            return torch.cuda.memory_allocated() / 1024 / 1024 / 1024
+        return 0.0
 
 def get_args():
     p = argparse.ArgumentParser(
@@ -143,7 +189,9 @@ def main():
 
     torch.manual_seed(args.seed)
 
-    # 設定 tokenizer 
+    memory_monitor = GPUMemoryMonitor()
+    memory_monitor.start_monitoring()
+
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
     # --- Tokenizer ---
@@ -183,6 +231,8 @@ def main():
 
     model = AutoModelForCausalLM.from_pretrained(args.base_model, **from_kwargs)
     model.config.use_cache = False
+    
+    print(f"[INFO] Memory after model loading: {memory_monitor.get_current_memory():.2f} GB")
 
     # FlashAttention
     if args.attn_impl == "flash_attn2":
@@ -297,6 +347,16 @@ def main():
         merged.save_pretrained(merged_dir, safe_serialization=True)
         tokenizer.save_pretrained(merged_dir)
         print(f"[saved] merged full model to: {merged_dir}")
+
+    peak_memory = memory_monitor.stop_monitoring()
+    
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+        gc.collect()
+    
+    print(f"\n=== FINAL MEMORY SUMMARY ===")
+    print(f"Peak GPU Memory Usage: {peak_memory:.2f} GB")
+    print(f"============================")
 
 if __name__ == "__main__":
     main()
