@@ -9,7 +9,7 @@ import torch
 from datasets import load_dataset
 from transformers import AutoModelForCausalLM, AutoTokenizer, TrainingArguments, DataCollatorForLanguageModeling, Trainer
 from peft import LoraConfig, get_peft_model
-import trl
+# import trl
 
 from itertools import islice
 import numpy as np

@@ -1,27 +1,20 @@
 #!/bin/bash
-#SBATCH -p gtest 
-#SBATCH --account=ACD110018 
-#SBATCH --nodes=1 
-#SBATCH --ntasks-per-node=1 
-#SBATCH --time=00:30:00 
-#SBATCH --cpus-per-task=4 
-#SBATCH --gpus-per-node=1 
-#SBATCH --mem=90G 
-
 
 # 1. 確保 log 目錄存在
 # Use your conda / venv / uv env
-ml biology/miniconda/miniconda3 biology/cuda/12.0.0 compiler/gcc/10.4.0
-conda activate lora
+module use /opt/nvidia/hpc_sdk/modulefiles
+ml nvhpc-byo-compiler/21.7
+source /opt/miniconda3/etc/profile.d/conda.sh
+conda activate finetune
 
 # Change this to your working / logs directory
-WORK_DIR=$HOME/llama/fine-tune-comparison
+WORK_DIR=$HOME/llm-inference/lch/fine-tune-comparison
 SUB_LOG_DIR=test
 LOG_NAME=finetune
 LOG_DIR=$WORK_DIR/logs/${SUB_LOG_DIR}_$(date +"%Y-%m-%d_%H:%M:%S")
 
 
-cd $WORK_DIR
+cd $WORK_DIR/power_scripts/nv
 
 mkdir -p $LOG_DIR
 
@@ -30,9 +23,11 @@ python3 monitor_nv.py $LOG_DIR & MONITOR_PID=$!
 
 echo "[$(date)] 啟動監控 (PID: $MONITOR_PID) 並執行程式..."
 
+cd $WORK_DIR
+
 # 3. 執行指令
-deepspeed --num_gpus 1 train.py \
-  --model_name_or_path /work/jonathan0hsu/llm-inference/model/Llama-3-8B-Instruct \
+deepspeed --num_gpus 1 $WORK_DIR/train.py \
+  --model_name_or_path /home/lsalab/llm-inference/lch/Meta-Llama-3-8B-Instruct \
   --deepspeed ds_z2.json \
   --per_device_train_batch_size 1 \
   --gradient_accumulation_steps 1 \
