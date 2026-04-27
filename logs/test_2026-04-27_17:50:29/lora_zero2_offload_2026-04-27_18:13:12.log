@@ -1,0 +1,53 @@
+[2026-04-27 18:13:17,205] [WARNING] [runner.py:232:fetch_hostfile] Unable to find hostfile, will proceed with training with local resources only.
+[2026-04-27 18:13:17,205] [INFO] [runner.py:630:main] cmd = /home/lsalab/.conda/envs/finetune/bin/python3.1 -u -m deepspeed.launcher.launch --world_info=eyJsb2NhbGhvc3QiOiBbMF19 --master_addr=127.0.0.1 --master_port=29500 --enable_each_rank_log=None --log_level=info /home/lsalab/llm-inference/lch/fine-tune-comparison/train.py --model_name_or_path /home/lsalab/llm-inference/lch/Meta-Llama-3-8B-Instruct --deepspeed /home/lsalab/llm-inference/lch/fine-tune-comparison/ds_z2_offload.json --per_device_train_batch_size 1 --gradient_accumulation_steps 1 --learning_rate 1e-3 --num_train_epochs 1 --logging_steps 10 --save_steps 100 --warmup_steps 30 --max_length 350 --lora --lora_r 64 --lora_alpha 16 --lora_dropout 0.05 --attn_impl eager --fp16
+[2026-04-27 18:13:21,633] [INFO] [launch.py:162:main] WORLD INFO DICT: {'localhost': [0]}
+[2026-04-27 18:13:21,633] [INFO] [launch.py:168:main] nnodes=1, num_local_procs=1, node_rank=0
+[2026-04-27 18:13:21,633] [INFO] [launch.py:179:main] global_rank_mapping=defaultdict(<class 'list'>, {'localhost': [0]})
+[2026-04-27 18:13:21,633] [INFO] [launch.py:180:main] dist_world_size=1
+[2026-04-27 18:13:21,633] [INFO] [launch.py:184:main] Setting CUDA_VISIBLE_DEVICES=0
+[2026-04-27 18:13:21,634] [INFO] [launch.py:272:main] process 836556 spawned with command: ['/home/lsalab/.conda/envs/finetune/bin/python3.1', '-u', '/home/lsalab/llm-inference/lch/fine-tune-comparison/train.py', '--local_rank=0', '--model_name_or_path', '/home/lsalab/llm-inference/lch/Meta-Llama-3-8B-Instruct', '--deepspeed', '/home/lsalab/llm-inference/lch/fine-tune-comparison/ds_z2_offload.json', '--per_device_train_batch_size', '1', '--gradient_accumulation_steps', '1', '--learning_rate', '1e-3', '--num_train_epochs', '1', '--logging_steps', '10', '--save_steps', '100', '--warmup_steps', '30', '--max_length', '350', '--lora', '--lora_r', '64', '--lora_alpha', '16', '--lora_dropout', '0.05', '--attn_impl', 'eager', '--fp16']
+[INFO] GPU memory monitoring started
+Special tokens have been added in the vocabulary, make sure the associated word embeddings are fine-tuned or trained.
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:03<00:09,  3.00s/it]Loading checkpoint shards:  50%|█████     | 2/4 [00:05<00:05,  2.58s/it]Loading checkpoint shards:  75%|███████▌  | 3/4 [00:07<00:02,  2.58s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:08<00:00,  1.76s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:08<00:00,  2.09s/it]
+[INFO] Memory after model loading: 15.15 GB
+[INFO] estimated avg seq len = 268.4
+trainable params: 167,772,160 || all params: 8,198,033,408 || trainable%: 2.0465
+Map:   0%|          | 0/1000 [00:00<?, ? examples/s]Map:  11%|█         | 112/1000 [00:00<00:00, 1099.99 examples/s]Map:  22%|██▏       | 224/1000 [00:00<00:00, 1105.48 examples/s]Map:  37%|███▋      | 371/1000 [00:00<00:00, 1025.55 examples/s]Map:  52%|█████▏    | 523/1000 [00:00<00:00, 1018.60 examples/s]Map:  66%|██████▌   | 661/1000 [00:00<00:00, 969.43 examples/s] Map:  77%|███████▋  | 771/1000 [00:00<00:00, 998.96 examples/s]Map:  92%|█████████▏| 923/1000 [00:00<00:00, 997.19 examples/s]Map: 100%|██████████| 1000/1000 [00:01<00:00, 911.56 examples/s]
+/home/lsalab/.conda/envs/finetune/lib/python3.10/site-packages/accelerate/accelerator.py:446: FutureWarning: Passing the following arguments to `Accelerator` is deprecated and will be removed in version 1.0 of Accelerate: dict_keys(['dispatch_batches', 'split_batches', 'even_batches', 'use_seedable_sampler']). Please pass an `accelerate.DataLoaderConfiguration` instead: 
+dataloader_config = DataLoaderConfiguration(dispatch_batches=None, split_batches=False, even_batches=True, use_seedable_sampler=True)
+  warnings.warn(
+[2026-04-27 18:13:43,937] [WARNING] [cpu_adam.py:84:__init__] FP16 params for CPUAdam may not work on AMD CPUs
+[rank0]: Traceback (most recent call last):
+[rank0]:   File "/home/lsalab/llm-inference/lch/fine-tune-comparison/train.py", line 362, in <module>
+[rank0]:     main()
+[rank0]:   File "/home/lsalab/llm-inference/lch/fine-tune-comparison/train.py", line 327, in main
+[rank0]:     train_out = trainer.train()
+[rank0]:   File "/home/lsalab/.conda/envs/finetune/lib/python3.10/site-packages/transformers/trainer.py", line 1624, in train
+[rank0]:     return inner_training_loop(
+[rank0]:   File "/home/lsalab/.conda/envs/finetune/lib/python3.10/site-packages/transformers/trainer.py", line 1776, in _inner_training_loop
+[rank0]:     model, self.optimizer = self.accelerator.prepare(self.model, self.optimizer)
+[rank0]:   File "/home/lsalab/.conda/envs/finetune/lib/python3.10/site-packages/accelerate/accelerator.py", line 1284, in prepare
+[rank0]:     result = self._prepare_deepspeed(*args)
+[rank0]:   File "/home/lsalab/.conda/envs/finetune/lib/python3.10/site-packages/accelerate/accelerator.py", line 1745, in _prepare_deepspeed
+[rank0]:     optimizer = DeepSpeedCPUAdam(optimizer.param_groups, **defaults)
+[rank0]:   File "/home/lsalab/.conda/envs/finetune/lib/python3.10/site-packages/deepspeed/ops/adam/cpu_adam.py", line 94, in __init__
+[rank0]:     self.ds_opt_adam = CPUAdamBuilder().load()
+[rank0]:   File "/home/lsalab/.conda/envs/finetune/lib/python3.10/site-packages/deepspeed/ops/op_builder/builder.py", line 543, in load
+[rank0]:     return self.jit_load(verbose)
+[rank0]:   File "/home/lsalab/.conda/envs/finetune/lib/python3.10/site-packages/deepspeed/ops/op_builder/builder.py", line 576, in jit_load
+[rank0]:     cxx_args = self.strip_empty_entries(self.cxx_args())
+[rank0]:   File "/home/lsalab/.conda/envs/finetune/lib/python3.10/site-packages/deepspeed/ops/op_builder/builder.py", line 859, in cxx_args
+[rank0]:     CUDA_ENABLE = self.get_cuda_compile_flag()
+[rank0]:   File "/home/lsalab/.conda/envs/finetune/lib/python3.10/site-packages/deepspeed/ops/op_builder/builder.py", line 431, in get_cuda_compile_flag
+[rank0]:     assert_no_cuda_mismatch(self.name)
+[rank0]:   File "/home/lsalab/.conda/envs/finetune/lib/python3.10/site-packages/deepspeed/ops/op_builder/builder.py", line 109, in assert_no_cuda_mismatch
+[rank0]:     raise CUDAMismatchException(
+[rank0]: deepspeed.ops.op_builder.builder.CUDAMismatchException: >- DeepSpeed Op Builder: Installed CUDA version 11.4 does not match the version torch was compiled with 12.1, unable to compile cuda/cpp extensions without a matching cuda version.
+Exception ignored in: <function DeepSpeedCPUAdam.__del__ at 0x7f5a9891a170>
+Traceback (most recent call last):
+  File "/home/lsalab/.conda/envs/finetune/lib/python3.10/site-packages/deepspeed/ops/adam/cpu_adam.py", line 102, in __del__
+    self.ds_opt_adam.destroy_adam(self.opt_id)
+AttributeError: 'DeepSpeedCPUAdam' object has no attribute 'ds_opt_adam'
+[rank0]:[W427 18:13:47.636062801 ProcessGroupNCCL.cpp:1250] Warning: WARNING: process group has NOT been destroyed before we destruct ProcessGroupNCCL. On normal program exit, the application should call destroy_process_group to ensure that any pending NCCL operations have finished in this process. In rare cases this process can exit before this point and block the progress of another member of the process group. This constraint has always been present,  but this warning has only been added since PyTorch 2.4 (function operator())
+[2026-04-27 18:13:48,662] [INFO] [launch.py:335:sigkill_handler] Killing subprocess 836556
+[2026-04-27 18:13:48,663] [ERROR] [launch.py:341:sigkill_handler] ['/home/lsalab/.conda/envs/finetune/bin/python3.1', '-u', '/home/lsalab/llm-inference/lch/fine-tune-comparison/train.py', '--local_rank=0', '--model_name_or_path', '/home/lsalab/llm-inference/lch/Meta-Llama-3-8B-Instruct', '--deepspeed', '/home/lsalab/llm-inference/lch/fine-tune-comparison/ds_z2_offload.json', '--per_device_train_batch_size', '1', '--gradient_accumulation_steps', '1', '--learning_rate', '1e-3', '--num_train_epochs', '1', '--logging_steps', '10', '--save_steps', '100', '--warmup_steps', '30', '--max_length', '350', '--lora', '--lora_r', '64', '--lora_alpha', '16', '--lora_dropout', '0.05', '--attn_impl', 'eager', '--fp16'] exits with return code = 1
