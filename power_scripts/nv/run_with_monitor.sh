@@ -28,7 +28,26 @@ cd $WORK_DIR
 # 3. 執行指令
 deepspeed --num_gpus 1 $WORK_DIR/train.py \
   --model_name_or_path /home/lsalab/llm-inference/lch/Meta-Llama-3-8B-Instruct \
-  --deepspeed ds_z2.json \
+  --deepspeed $WORK_DIR/ds_naive.json \
+  --per_device_train_batch_size 1 \
+  --gradient_accumulation_steps 1 \
+  --learning_rate 1e-3 \
+  --num_train_epochs 1 \
+  --logging_steps 10 \
+  --save_steps 100 \
+  --warmup_steps 30 \
+  --max_length 350 \
+  --lora \
+  --lora_r 64 \
+  --lora_alpha 16 \
+  --lora_dropout 0.05 \
+  --attn_impl eager \
+  --fp16 \
+  2>&1 | tee $LOG_DIR/lora_$(date +"%Y-%m-%d_%H:%M:%S").log
+
+  deepspeed --num_gpus 1 $WORK_DIR/train.py \
+  --model_name_or_path /home/lsalab/llm-inference/lch/Meta-Llama-3-8B-Instruct \
+  --deepspeed $WORK_DIR/ds_z2.json \
   --per_device_train_batch_size 1 \
   --gradient_accumulation_steps 1 \
   --learning_rate 1e-3 \
@@ -44,7 +63,44 @@ deepspeed --num_gpus 1 $WORK_DIR/train.py \
   --attn_impl eager \
   --fp16 \
   2>&1 | tee $LOG_DIR/lora_zero2_$(date +"%Y-%m-%d_%H:%M:%S").log
-    
+
+  deepspeed --num_gpus 1 $WORK_DIR/train.py \
+  --model_name_or_path /home/lsalab/llm-inference/lch/Meta-Llama-3-8B-Instruct \
+  --deepspeed $WORK_DIR/ds_z2_offload.json \
+  --per_device_train_batch_size 1 \
+  --gradient_accumulation_steps 1 \
+  --learning_rate 1e-3 \
+  --num_train_epochs 1 \
+  --logging_steps 10 \
+  --save_steps 100 \
+  --warmup_steps 30 \
+  --max_length 350 \
+  --lora \
+  --lora_r 64 \
+  --lora_alpha 16 \
+  --lora_dropout 0.05 \
+  --attn_impl eager \
+  --fp16 \
+  2>&1 | tee $LOG_DIR/lora_zero2_offload_$(date +"%Y-%m-%d_%H:%M:%S").log
+
+  deepspeed --num_gpus 1 $WORK_DIR/train.py \
+  --model_name_or_path /home/lsalab/llm-inference/lch/Meta-Llama-3-8B-Instruct \
+  --deepspeed $WORK_DIR/ds_naive.json \
+  --per_device_train_batch_size 1 \
+  --gradient_accumulation_steps 1 \
+  --learning_rate 1e-3 \
+  --num_train_epochs 1 \
+  --logging_steps 10 \
+  --save_steps 100 \
+  --warmup_steps 30 \
+  --max_length 350 \
+  --qlora \
+  --lora_r 64 \
+  --lora_alpha 16 \
+  --lora_dropout 0.05 \
+  --attn_impl eager \
+  --fp16 \
+  2>&1 | tee $LOG_DIR/qlora_$(date +"%Y-%m-%d_%H:%M:%S").log
 
 # 4. 程式結束後，通知監控腳本停止執行
 echo "[$(date)] 程式執行完畢，正在停止監控並產生圖表..."
